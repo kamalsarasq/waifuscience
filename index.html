@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waifu Science — Under Development</title>
+<meta name="theme-color" content="#0b1020">
+
+<style>
+:root{
+  --bg:#0b1020;
+  --card:rgba(17,22,42,.85);
+  --text:#e6e8ef;
+  --muted:#9aa0b5;
+  --accent:#4f7cff;
+  --glow:rgba(79,124,255,.45);
+  --border:rgba(255,255,255,.08);
+  --ripple:rgba(255,255,255,.35);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:24px;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+.container{
+  width:100%;
+  max-width:760px;
+}
+
+.card{
+  position: relative;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.18),
+      rgba(255,255,255,0.06)
+    );
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 22px;
+  padding: 44px 40px;
+
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+
+  overflow: hidden;
+}
+
+
+
+.badge{
+  display:inline-flex;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:13px;
+  color:var(--accent);
+  background:rgba(79,124,255,.12);
+  border:1px solid rgba(79,124,255,.25);
+  margin-bottom:22px;
+}
+
+h1{
+  margin:0 0 14px;
+  font-size:clamp(30px,4vw,42px);
+  letter-spacing:-.02em;
+}
+
+p{
+  margin:0 0 30px;
+  color:var(--muted);
+  line-height:1.65;
+  max-width:600px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.btn{
+  position:relative;
+  overflow:hidden;
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 20px;
+  border-radius:14px;
+  font-weight:600;
+  font-size:15px;
+  text-decoration:none;
+  color:var(--text);
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+}
+
+.btn.primary{
+  background:linear-gradient(180deg,#5a86ff,#4f7cff);
+  color:#fff;
+  border:none;
+  box-shadow:0 12px 36px var(--glow);
+}
+
+.arrow{
+  width:14px;
+  height:14px;
+  border-top:2px solid currentColor;
+  border-right:2px solid currentColor;
+  transform:rotate(45deg);
+  transition:transform .3s ease;
+}
+
+.btn:hover .arrow{
+  transform:rotate(45deg) translate(6px,-6px);
+}
+
+.ripple{
+  position:absolute;
+  border-radius:50%;
+  transform:scale(0);
+  animation:ripple 650ms linear;
+  background:var(--ripple);
+  pointer-events:none;
+}
+
+@keyframes ripple{
+  to{transform:scale(4);opacity:0}
+}
+
+.footer{
+  margin-top:26px;
+  font-size:13px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+  <div class="card">
+    <div class="badge">status · under development</div>
+
+    <h1>Website is under development</h1>
+    <p>
+      Waifu Science is currently under development. Join our socials.
+    </p>
+
+    <div class="actions">
+      <a class="btn primary" href="https://discord.gg/FW7kbyPgbG" target="_blank">
+        Discord Server <span class="arrow"></span>
+      </a>
+      <a class="btn" href="https://www.roblox.com/communities/108252590/Waifu-Science#!/about" target="_blank">
+        Roblox Group <span class="arrow"></span>
+      </a>
+    </div>
+
+    <div class="footer">© <span id="year"></span> Waifu Science</div>
+  </div>
+</div>
+
+<script>
+document.getElementById("year").textContent=new Date().getFullYear();
+
+/* RIPPLE */
+document.querySelectorAll(".btn").forEach(b=>{
+  b.addEventListener("click",e=>{
+    const r=document.createElement("span");
+    r.className="ripple";
+    const rect=b.getBoundingClientRect();
+    r.style.left=e.clientX-rect.left+"px";
+    r.style.top=e.clientY-rect.top+"px";
+    b.appendChild(r);
+    setTimeout(()=>r.remove(),650);
+  });
+});
+
+/* ==== ADVANCED MATH BACKGROUND ==== */
+const c=document.getElementById("bg");
+const ctx=c.getContext("2d");
+let w,h,t=0;
+const mouse={x:.5,y:.5};
+
+function resize(){
+  w=c.width=innerWidth;
+  h=c.height=innerHeight;
+}
+resize(); addEventListener("resize",resize);
+
+addEventListener("mousemove",e=>{
+  mouse.x=e.clientX/w;
+  mouse.y=e.clientY/h;
+});
+
+const particles=[];
+const COUNT=160;
+
+for(let i=0;i<COUNT;i++){
+  particles.push({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    vx:0,vy:0
+  });
+}
+
+function noise(x,y){
+  return Math.sin(x*.002+t)+Math.cos(y*.002+t*1.3);
+}
+
+function draw(){
+  ctx.clearRect(0,0,w,h);
+
+  for(let i=0;i<particles.length;i++){
+    const p=particles[i];
+    const n=noise(p.x,p.y);
+    const angle=n*Math.PI;
+
+    const mx=(mouse.x-.5)*200;
+    const my=(mouse.y-.5)*200;
+
+    p.vx+=Math.cos(angle)*.3+(mx-p.x)*0.00001;
+    p.vy+=Math.sin(angle)*.3+(my-p.y)*0.00001;
+
+    p.vx*=.95; p.vy*=.95;
+    p.x+=p.vx; p.y+=p.vy;
+
+    if(p.x<0||p.x>w||p.y<0||p.y>h){
+      p.x=Math.random()*w; p.y=Math.random()*h;
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,1.6,0,Math.PI*2);
+    ctx.fillStyle="rgba(79,124,255,.55)";
+    ctx.fill();
+
+    for(let j=i+1;j<particles.length;j++){
+      const q=particles[j];
+      const d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<120){
+        ctx.strokeStyle=`rgba(79,124,255,${0.12*(1-d/120)})`;
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(q.x,q.y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  t+=0.008;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
